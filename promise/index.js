@@ -10,13 +10,15 @@ const bookList = () => {
 const addBook = (newBook) => {
   const promise1 = new Promise((resolve, reject) => {
     books.push(newBook);
-    resolve("Başarılı");
+    resolve("Ekleme İşlemi Gerçekleştirildi");
+    // reject("Ekleme İşlemi Gerçekleştirilemedi.")
   });
   return promise1;
 };
 
 addBook({ name: "book3", author: "author3" })
-  .then(() => {
+  .then((message) => {
+    console.log(message);
     bookList();
   })
   .catch((err) => {
