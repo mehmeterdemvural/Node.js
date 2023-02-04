@@ -22,5 +22,8 @@
   "homepage": "https://github.com/mehmeterdemvural/Node.js/tree/main#readme",
   "devDependencies": {
     "prettier": "2.8.3"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
   }
 }
