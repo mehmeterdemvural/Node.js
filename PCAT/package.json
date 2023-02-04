@@ -1,0 +1,26 @@
+{
+  "name": "pcat",
+  "version": "1.0.0",
+  "description": "PCAT Photo App",
+  "main": "App.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mehmeterdemvural/Node.js.git#main"
+  },
+  "keywords": [
+    "photo",
+    "app"
+  ],
+  "author": "Mehmet Erdem VURAL <mehmeterdemvural@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mehmeterdemvural/Node.js/issues"
+  },
+  "homepage": "https://github.com/mehmeterdemvural/Node.js/tree/main#readme",
+  "devDependencies": {
+    "prettier": "2.8.3"
+  }
+}
