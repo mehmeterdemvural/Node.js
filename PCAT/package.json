@@ -2,9 +2,11 @@
   "name": "pcat",
   "version": "1.0.0",
   "description": "PCAT Photo App",
+  "type": "module",
   "main": "App.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon App"
   },
   "repository": {
     "type": "git",
@@ -21,6 +23,7 @@
   },
   "homepage": "https://github.com/mehmeterdemvural/Node.js/tree/main#readme",
   "devDependencies": {
+    "nodemon": "^2.0.20",
     "prettier": "2.8.3"
   },
   "dependencies": {
