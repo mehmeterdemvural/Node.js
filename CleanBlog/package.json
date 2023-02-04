@@ -3,9 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "main": "App.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon App"
   },
   "author": "Mehmet Erdem VURAL <mehmeterdemvural>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.20",
+    "prettier": "2.8.3"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
