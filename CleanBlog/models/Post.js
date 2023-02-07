@@ -5,8 +5,8 @@ const Schema = mongoose.Schema;
 mongoose.set('strictQuery', false);
 
 const PostSchema = new Schema({
-  name: String,
-  message: String,
+  title: String,
+  detail: String,
   dateCreated: {
     type: Date,
     default: Date.now(),
