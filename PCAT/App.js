@@ -22,7 +22,11 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(fileupload());
-app.use(methodOverride('_method'));
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'],
+  })
+);
 
 const uploadDir = './public/uploads';
 if (!fs.existsSync(uploadDir)) {
@@ -84,6 +88,14 @@ app.put('/photos/:id', async (req, res) => {
   photo.save();
 
   res.redirect(`/photo/${req.params.id}`);
+});
+
+app.delete('/photos/:id', async (req, res) => {
+  const photo = await Photo.findById(req.params.id);
+  let deleteImageUrl = './public' + photo.image;
+  fs.unlinkSync(deleteImageUrl);
+  await Photo.findByIdAndRemove(req.params.id);
+  res.redirect('/');
 });
 
 const port = 3000;
