@@ -1,16 +1,22 @@
 import { Photo } from '../models/Photo.js';
-import fs from "fs";
+import fs from 'fs';
 
 const getAllPhotos = async (req, res) => {
-  const photos = await Photo.find({}).sort({ dateCreated: -1 });
+  const photosPerPage = 3;
+  const photo = (await req.query.page) || 1;
+  const photos = await Photo.find({}).sort({ dateCreated: -1 }).skip((photo - 1) * photosPerPage).limit(photosPerPage);
+  const totalPhotos = await Photo.find().count();
+  const totalPage = Math.ceil(totalPhotos / photosPerPage);
+  console.log(totalPage);
   res.render('index', {
     photos,
+    totalPhotos,
+    photo,
+    totalPage,
   });
 };
 
 const getPhoto = async (req, res) => {
-  // console.log(req.params.id);
-  // res.render('about');
   const photo = await Photo.findById(req.params.id);
   res.render('photo', {
     photo,
@@ -18,7 +24,6 @@ const getPhoto = async (req, res) => {
 };
 
 const addPhoto = async (req, res) => {
-  // console.log(req.files)
   let uploadedImage = req.files.image;
   let uploadPath = './public/uploads/' + uploadedImage.name;
 

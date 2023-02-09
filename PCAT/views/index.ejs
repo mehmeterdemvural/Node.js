@@ -54,8 +54,8 @@
                     <div class="row tm-catalog-item-list">
 
                         <% for (let i = 0; i <photos.length; i++){ %>
-                            
-                        
+
+
 
 
                         <div class="col-lg-4 col-md-6 col-sm-12 tm-catalog-item">
@@ -78,15 +78,21 @@
                     </div>
 
                     <!-- Catalog Paging Buttons -->
+                    <% if (totalPage > 1) { %>
                     <div>
                         <ul class="nav tm-paging-links">
-                            <li class="nav-item active"><a href="#" class="nav-link tm-paging-link">1</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">2</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">3</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">4</a></li>
-                            <li class="nav-item"><a href="#" class="nav-link tm-paging-link">></a></li>
+                            <% for(let i = 1; i <= totalPage; i++ ){ %>
+                            <% if (photo == i) { %>
+                            <li class="nav-item active"><a href='/?page=<%= i %>'
+                                    class="nav-link tm-paging-link"><%= i %></a></li>
+                            <% } else { %>
+                            <li class="nav-item"><a href='/?page=<%= i %>'
+                                    class="nav-link tm-paging-link"><%= i %></a></li>
+                            <% } %>
+                            <% } %>
                         </ul>
                     </div>
+                    <% } %>
                 </main>
 
                 <%- include('partials/_footer.ejs') -%>
