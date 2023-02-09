@@ -1,8 +1,22 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import ejs from 'ejs';
+import methodOverride from 'method-override';
 
 import { Post } from './models/Post.js';
+import {
+  addPost,
+  getAllPosts,
+  getPost,
+  editPost,
+  deletePost,
+} from './controllers/postControllers.js';
+import {
+  getAboutPage,
+  getAddPostPage,
+  getEditPage,
+  getNotFoundPage,
+} from './controllers/pageController.js';
 
 const app = express();
 mongoose.set('strictQuery', false);
@@ -19,39 +33,21 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(
+  methodOverride('_method', {
+    methods: ['POST', 'GET'],
+  })
+);
 
-app.get('/', async (req, res) => {
-  const post = await Post.find({});
-  res.render('index', {
-    post,
-  });
-});
-app.get('/post/:id', async (req, res) => {
-  const post = await Post.findById(req.params.id);
-  res.render('post', {
-    post,
-  });
-});
-
-app.get('/about', (req, res) => {
-  res.render('about');
-});
-app.get('/post', (req, res) => {
-  res.render('post');
-});
-app.get('/add_post', (req, res) => {
-  res.render('add_post');
-});
-
-app.post('/post', async (req, res) => {
-  await Post.create(req.body, (err, post) => {
-    console.log(req.body);
-    if (err) {
-      console.log(err);
-    }
-  });
-  res.redirect('/');
-});
+app.get('/', getAllPosts);
+app.get('/post/:id', getPost);
+app.post('/post', addPost);
+app.put('/post/:id', editPost);
+app.delete('/post/:id', deletePost);
+app.get('/about', getAboutPage);
+app.get('/add_post', getAddPostPage);
+app.get('/edit/post/:id', getEditPage);
+app.get('*', getNotFoundPage);
 
 const port = 3000;
 app.listen(port, () => {
