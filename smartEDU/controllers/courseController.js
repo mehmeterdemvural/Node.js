@@ -1,11 +1,19 @@
 import { Course } from '../models/Course.js';
+import { Category } from '../models/Category.js';
 
 const createCourse = async (req, res) => {
   try {
-    const course = await Course.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      course,
+    let uploadedImage = req.files.image;
+    let uploadPath = './public/uploads/' + uploadedImage.name;
+    uploadedImage.mv(uploadPath, async () => {
+      const course = await Course.create({
+        ...req.body,
+        image: '/uploads/' + uploadedImage.name,
+      });
+      res.status(201).json({
+        status: 'success',
+        course,
+      });
     });
   } catch (error) {
     res.status(400).json({
@@ -17,11 +25,27 @@ const createCourse = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find();
+    const categorySlug = await req.query.categories;
+
+    let category;
+
+    let filter = {};
+
+    if (categorySlug) {
+      category = await Category.findOne({ slug: categorySlug });
+      filter = { category: category._id };
+    }
+
+    const courses = await Course.find(filter).sort({ createdAt: -1 });
+
+    const categories = await Category.find({}).sort({ name: 1 });
+
     res.status(200).render('courses', {
       status: 'success',
       page_name: 'courses',
       courses,
+      categories,
+      categorySlug,
     });
   } catch (error) {
     res.status(400).json({
@@ -33,7 +57,7 @@ const getAllCourses = async (req, res) => {
 
 const getCourse = async (req, res) => {
   try {
-    const course = await Course.findOne( {slug: req.params.slug });
+    const course = await Course.findOne({ slug: req.params.slug });
     res.render('course', {
       status: 'success',
       page_name: 'courses',

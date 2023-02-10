@@ -5,16 +5,11 @@ const Schema = mongoose.Schema;
 
 mongoose.set('strictQuery', false);
 
-const CourseSchema = new Schema({
+const CategorySchema = new Schema({
   name: {
     type: String,
     unique: true,
     required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-    trim: true,
   },
   createdAt: {
     type: Date,
@@ -24,17 +19,9 @@ const CourseSchema = new Schema({
     type: String,
     unique: true,
   },
-  image: {
-    type: String,
-    required: true,
-  },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-  },
 });
 
-CourseSchema.pre('validate', function (next) {
+CategorySchema.pre('validate', function (next) {
   this.slug = slugify(this.name, {
     lower: true,
     strict: true,
@@ -42,6 +29,6 @@ CourseSchema.pre('validate', function (next) {
   next();
 });
 
-const Course = mongoose.model('Course', CourseSchema);
+const Category = mongoose.model('Category', CategorySchema);
 
-export { Course };
+export { Category };

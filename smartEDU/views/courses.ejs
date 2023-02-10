@@ -27,7 +27,7 @@
 						<div class="col-md-6 col-sm-12">
 							<div class="blog-item">
 								<div class="image-blog">
-									<img src="/images/blog_1.jpg" alt="" class="img-fluid">
+									<a href="/courses/course/<%= courses[i].slug %>"><img src="<%= courses[i].image %>" alt="<%= courses[i].name %>" title="<%= courses[i].name %>" class="img-fluid"></a>
 								</div>
 								<div class="meta-info-blog">
 									<span><i class="fa fa-calendar"></i> <a
@@ -41,8 +41,9 @@
 								</div>
 								<div class="blog-desc">
 									<a href="/courses/course/<%= courses[i].slug %>">
-										<p><%= courses[i].description %></p></a>
-									
+										<p><%= courses[i].description %></p>
+									</a>
+
 								</div>
 								<div class="blog-button">
 									<a class="hover-btn-new orange" href="#"><span>Read More<span></a>
@@ -68,30 +69,11 @@
 					<div class="widget-categories">
 						<h3 class="widget-title">Categories</h3>
 						<ul>
-							<li><a href="#">Political Science</a></li>
-							<li><a href="#">Business Leaders Guide</a></li>
-							<li><a href="#">Become a Product Manage</a></li>
-							<li><a href="#">Language Education</a></li>
-							<li><a href="#">Micro Biology</a></li>
-							<li><a href="#">Social Media Management</a></li>
-						</ul>
-					</div>
-					<div class="widget-tags">
-						<h3 class="widget-title">Search Tags</h3>
-						<ul class="tags">
-							<li><a href="#"><b>business</b></a></li>
-							<li><a href="#"><b>jquery</b></a></li>
-							<li><a href="#">corporate</a></li>
-							<li><a href="#">portfolio</a></li>
-							<li><a href="#">css3</a></li>
-							<li><a href="#"><b>theme</b></a></li>
-							<li><a href="#"><b>html5</b></a></li>
-							<li><a href="#"><b>mysql</b></a></li>
-							<li><a href="#">multipurpose</a></li>
-							<li><a href="#">responsive</a></li>
-							<li><a href="#">premium</a></li>
-							<li><a href="#">javascript</a></li>
-							<li><a href="#"><b>Best jQuery</b></a></li>
+							<% for (let i = 0; i < categories.length; i++) { %>
+							<li><a href="/courses?categories=<%= categories[i].slug %>"
+									class="<%= categorySlug === categories[i].slug && 'sidebar-active' %>">
+									<%= categories[i].name %> </a></li>
+							<% } %>
 						</ul>
 					</div>
 				</div>
