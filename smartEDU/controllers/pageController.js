@@ -16,4 +16,9 @@ const getRegisterPage = (req, res) => {
   });
 };
 
-export { getAboutPage, getIndexPage, getRegisterPage };
+const getLoginPage = (req, res) => {
+  res.status(200).render('login', {
+    page_name: 'login',
+  });
+};
+export { getAboutPage, getIndexPage, getRegisterPage, getLoginPage };
