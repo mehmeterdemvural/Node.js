@@ -24,7 +24,7 @@ const loginUser = async (req, res) => {
       bcrypt.compare(password, user.password, (err, same) => {
         if (same) {
           req.session.userID = user._id;
-          res.status(201).redirect('/');
+          res.status(201).redirect('dashboard');
         } else {
           res.send('Wrong Password');
         }
@@ -52,4 +52,19 @@ const logoutUser = async (req, res) => {
     });
   }
 };
-export { createUser, loginUser, logoutUser };
+
+const getDashboardPage = async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userID);
+    res.status(200).render('dashboard', {
+      page_name: 'dashboard',
+      user,
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      error,
+    });
+  }
+};
+export { createUser, loginUser, logoutUser, getDashboardPage };
