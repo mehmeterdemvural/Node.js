@@ -39,4 +39,17 @@ const loginUser = async (req, res) => {
     });
   }
 };
-export { createUser, loginUser };
+
+const logoutUser = async (req, res) => {
+  try {
+    req.session.destroy(() => {
+      res.status(200).redirect('/');
+    });
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      error,
+    });
+  }
+};
+export { createUser, loginUser, logoutUser };
