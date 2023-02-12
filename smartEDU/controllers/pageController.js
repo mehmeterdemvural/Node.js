@@ -10,4 +10,10 @@ const getAboutPage = (req, res) => {
   });
 };
 
-export { getAboutPage, getIndexPage };
+const getRegisterPage = (req, res) => {
+  res.status(200).render('register', {
+    page_name: 'register',
+  });
+};
+
+export { getAboutPage, getIndexPage, getRegisterPage };
