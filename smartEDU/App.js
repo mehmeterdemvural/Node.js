@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import fileupload from 'express-fileupload';
 import methodOverride from 'method-override';
 import fs from 'fs';
+import session from 'express-session';
 
 import pageRoute from './routes/pageRoute.js';
 import courseRoute from './routes/courseRoute.js';
@@ -24,6 +25,9 @@ mongoose.connect('mongodb://127.0.0.1:27017/smartedu-db', (err, res) => {
 //Template State
 app.set('view engine', 'ejs');
 
+//Global Variable
+global.userIn = null;
+
 //Middlewares
 app.use(express.static('public'));
 app.use(express.json());
@@ -34,6 +38,17 @@ app.use(
     methods: ['POST', 'GET'],
   })
 );
+app.use(
+  session({
+    secret: 'my_keyboard_cat',
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+app.use('*', (req, res, next) => {
+  userIn = req.session.userID;
+  next();
+});
 
 const uploadDir = './public/uploads';
 if (!fs.existsSync(uploadDir)) {
