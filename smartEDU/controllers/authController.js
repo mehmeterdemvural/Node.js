@@ -1,12 +1,12 @@
 import { User } from '../models/User.js';
+import { Category} from '../models/Category.js'
 import bcrypt from 'bcrypt';
 
 const createUser = async (req, res) => {
   try {
     const user = await User.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      user,
+    res.status(201).render('login', {
+      page_name: 'login',
     });
   } catch (error) {
     res.status(400).json({
@@ -56,9 +56,11 @@ const logoutUser = async (req, res) => {
 const getDashboardPage = async (req, res) => {
   try {
     const user = await User.findById(req.session.userID);
+    const categories = await Category.find({}).sort({ name: 1 });
     res.status(200).render('dashboard', {
       page_name: 'dashboard',
       user,
+      categories,
     });
   } catch (error) {
     res.status(400).json({

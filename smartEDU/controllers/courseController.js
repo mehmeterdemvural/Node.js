@@ -1,5 +1,6 @@
 import { Course } from '../models/Course.js';
 import { Category } from '../models/Category.js';
+import { User } from '../models/User.js';
 
 const createCourse = async (req, res) => {
   try {
@@ -10,15 +11,12 @@ const createCourse = async (req, res) => {
         ...req.body,
         image: '/uploads/' + uploadedImage.name,
       });
-      res.status(201).json({
-        status: 'success',
-        course,
-      });
+      res.status(200).redirect(`/courses/course/${course.slug}`)
     });
   } catch (error) {
     res.status(400).json({
       status: 'fail',
-      error,
+      error: 'Kurs oluşturma başarısız',
     });
   }
 };
