@@ -28,7 +28,7 @@ const getAllCourses = async (req, res) => {
   try {
     const categorySlug = await req.query.categories;
     const searchQuery = await req.query.search;
-    console.log('SeracQuery', searchQuery);
+    const categories = await Category.find({}).sort({ name: 1 });
 
     let category;
 
@@ -57,8 +57,6 @@ const getAllCourses = async (req, res) => {
       .populate(['category', 'createdBy'])
       .sort({ createdAt: -1 });
 
-    const categories = await Category.find({}).sort({ name: 1 });
-
     res.status(200).render('courses', {
       status: 'success',
       page_name: 'courses',
@@ -81,6 +79,7 @@ const getCourse = async (req, res) => {
       'createdBy',
       'category',
     ]);
+    const userCount = await (await User.find({ courses: course._id })).length;
     const categories = await Category.find({}).sort({ name: 1 });
     res.render('course', {
       status: 'success',
@@ -88,6 +87,7 @@ const getCourse = async (req, res) => {
       course,
       categories,
       user,
+      userCount,
     });
   } catch (error) {
     res.status(400).json({

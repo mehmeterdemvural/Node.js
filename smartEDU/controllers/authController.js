@@ -62,7 +62,6 @@ const getDashboardPage = async (req, res) => {
     const courses = await Course.find({ createdBy: user }).sort({
       createdAt: -1,
     });
-    console.log(courses);
     res.status(200).render('dashboard', {
       page_name: 'dashboard',
       user,
