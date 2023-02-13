@@ -43,9 +43,9 @@
 										href="#"><%= course.createdAt.toLocaleString().substring(0, 10) %></a> </span>
 								<span><i class=" fa fa-paperclip"></i> <a
 										href="#"><%= course.category.name %></a></span>
-								<% if (user && user.role === 'teacher') { %>
+
 								<span><i class="fa fa-user"></i> <a href="#"><%= userCount %></a> </span>
-								<% } %>
+
 							</div>
 							<div class="blog-title">
 								<h2><a href="#" title=""><%= course.name %></a></h2>

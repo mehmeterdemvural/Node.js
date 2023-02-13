@@ -14,13 +14,12 @@ const createCourse = async (req, res) => {
         category: req.body.category,
         createdBy: req.session.userID,
       });
-      res.status(200).redirect(`/courses/course/${course.slug}`);
+      req.flash('success', `Course creation was successful ! !`);
+      res.status(201).redirect('/users/dashboard');
     });
-  } catch (error) {
-    res.status(400).json({
-      status: 'fail',
-      error: 'Kurs oluşturma başarısız',
-    });
+  } catch (err) {
+    req.flash('error', `Course creation was fail ! !`);
+    res.status(400).redirect('/users/dashboard');
   }
 };
 
@@ -56,6 +55,7 @@ const getAllCourses = async (req, res) => {
     })
       .populate(['category', 'createdBy'])
       .sort({ createdAt: -1 });
+  
 
     res.status(200).render('courses', {
       status: 'success',
@@ -63,6 +63,7 @@ const getAllCourses = async (req, res) => {
       courses,
       categories,
       categorySlug,
+
     });
   } catch (error) {
     res.status(400).json({

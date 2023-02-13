@@ -6,7 +6,10 @@ import { Course } from '../models/Course.js';
 
 const createUser = async (req, res) => {
   try {
-    const user = await User.create(req.body);
+    let user = await req.body;
+    await bcrypt.hash(req.body.password, 10, async function (err, hash) {
+      (user.password = hash), await User.create(user);
+    });
     res.status(201).render('login', {
       page_name: 'login',
     });
@@ -26,7 +29,7 @@ const loginUser = async (req, res) => {
       bcrypt.compare(password, user.password, (err, same) => {
         if (same) {
           req.session.userID = user._id;
-          res.status(201).redirect('dashboard');
+          res.status(201).redirect('/users/dashboard');
         } else {
           res.send('Wrong Password');
         }

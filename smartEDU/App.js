@@ -6,6 +6,7 @@ import methodOverride from 'method-override';
 import fs from 'fs';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
+import flash from 'connect-flash';
 
 import pageRoute from './routes/pageRoute.js';
 import courseRoute from './routes/courseRoute.js';
@@ -51,6 +52,11 @@ app.use(
 );
 app.use('*', (req, res, next) => {
   userIn = req.session.userID;
+  next();
+});
+app.use(flash());
+app.use((req, res, next) => {
+  res.locals.flashMessages = req.flash();
   next();
 });
 
