@@ -1,6 +1,8 @@
-import { User } from '../models/User.js';
-import { Category} from '../models/Category.js'
 import bcrypt from 'bcrypt';
+
+import { User } from '../models/User.js';
+import { Category } from '../models/Category.js';
+import { Course } from '../models/Course.js';
 
 const createUser = async (req, res) => {
   try {
@@ -55,12 +57,17 @@ const logoutUser = async (req, res) => {
 
 const getDashboardPage = async (req, res) => {
   try {
-    const user = await User.findById(req.session.userID);
+    const user = await User.findById(req.session.userID).populate('courses');
     const categories = await Category.find({}).sort({ name: 1 });
+    const courses = await Course.find({ createdBy: user }).sort({
+      createdAt: -1,
+    });
+    console.log(courses);
     res.status(200).render('dashboard', {
       page_name: 'dashboard',
       user,
       categories,
+      courses,
     });
   } catch (error) {
     res.status(400).json({

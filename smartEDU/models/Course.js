@@ -16,14 +16,6 @@ const CourseSchema = new Schema({
     required: true,
     trim: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  slug: {
-    type: String,
-    unique: true,
-  },
   image: {
     type: String,
     required: true,
@@ -31,6 +23,18 @@ const CourseSchema = new Schema({
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  slug: {
+    type: String,
+    unique: true,
   },
 });
 

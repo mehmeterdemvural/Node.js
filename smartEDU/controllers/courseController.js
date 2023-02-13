@@ -8,10 +8,13 @@ const createCourse = async (req, res) => {
     let uploadPath = './public/uploads/' + uploadedImage.name;
     uploadedImage.mv(uploadPath, async () => {
       const course = await Course.create({
-        ...req.body,
+        name: req.body.name,
+        description: req.body.description,
         image: '/uploads/' + uploadedImage.name,
+        category: req.body.category,
+        createdBy: req.session.userID,
       });
-      res.status(200).redirect(`/courses/course/${course.slug}`)
+      res.status(200).redirect(`/courses/course/${course.slug}`);
     });
   } catch (error) {
     res.status(400).json({
@@ -55,11 +58,15 @@ const getAllCourses = async (req, res) => {
 
 const getCourse = async (req, res) => {
   try {
-    const course = await Course.findOne({ slug: req.params.slug });
+    const course = await Course.findOne({ slug: req.params.slug }).populate(
+      'createdBy'
+    );
+    const categories = await Category.find({}).sort({ name: 1 });
     res.render('course', {
       status: 'success',
       page_name: 'courses',
       course,
+      categories,
     });
   } catch (error) {
     res.status(400).json({
@@ -68,4 +75,18 @@ const getCourse = async (req, res) => {
     });
   }
 };
-export { createCourse, getAllCourses, getCourse };
+
+const enrollCourse = async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userID);
+    await user.courses.push({ _id: req.body.course_id });
+    await user.save();
+    res.redirect('/users/dashboard');
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      error,
+    });
+  }
+};
+export { createCourse, getAllCourses, getCourse, enrollCourse };
