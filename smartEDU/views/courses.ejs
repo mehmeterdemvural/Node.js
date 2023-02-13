@@ -27,15 +27,16 @@
 						<div class="col-md-6 col-sm-12">
 							<div class="blog-item">
 								<div class="image-blog">
-									<a href="/courses/course/<%= courses[i].slug %>"><img src="<%= courses[i].image %>"
-											alt="<%= courses[i].name %>" title="<%= courses[i].name %>"
-											class="img-fluid"></a>
+									<a href="/courses/course/<%= courses[i].slug %>"><img style="height: 250px;"
+											src="<%= courses[i].image %>" alt="<%= courses[i].name %>"
+											title="<%= courses[i].name %>" class="img-fluid"></a>
 								</div>
 								<div class="meta-info-blog">
 									<span><i class="fa fa-calendar"></i> <a
-											href="#"><%= courses[i].createdAt.toLocaleString() %></a> </span>
-									<span><i class="fa fa-tag"></i> <a href="#">News</a> </span>
-									<span><i class="fa fa-comments"></i> <a href="#">12 Comments</a></span>
+											href="#"><%= courses[i].createdAt.toLocaleString().substring(0, 10) %></a> </span>
+									<span><i class="fa fa-tag"></i> <a href="#"><%= courses[i].createdBy.name %></a> </span>
+									<span><i class="fa fa-paperclip"></i> <a
+											href="#"><%= courses[i].category.name %></a></span>
 								</div>
 								<div class="blog-title">
 									<h2><a href="/courses/course/<%= courses[i].slug %>">
@@ -43,12 +44,18 @@
 								</div>
 								<div class="blog-desc">
 									<a href="/courses/course/<%= courses[i].slug %>">
+										<% if(courses[i].description.length > 100) { %>
+										<p><%= courses[i].description.substring(0, 100) + ' ...' %></p>
+										<% } else { %>
 										<p><%= courses[i].description %></p>
+										<% } %>
 									</a>
 
 								</div>
 								<div class="blog-button">
-									<a class="hover-btn-new orange" href="#"><span>Read More<span></a>
+									<a class="hover-btn-new orange text-center"
+										href="/courses/course/<%= courses[i].slug %>" style="width: 100%;"><span>Read
+											More<span></a>
 								</div>
 							</div>
 						</div><!-- end col -->
@@ -59,17 +66,19 @@
 				<div class="col-lg-3 col-md-4 col-sm-12 right-single">
 					<div class="widget-search">
 						<div class="site-search-area">
-							<form method="get" id="site-searchform" action="#">
+							<form method="GET" id="site-searchform" action="/courses">
 								<div>
-									<input class="input-text form-control" name="search-k" id="search-k"
-										placeholder="Search keywords..." type="text">
-									<input id="searchsubmit" value="Search" type="submit">
+									<input class="input-text form-control" name="search" id="search"
+										placeholder="Search . . ." type="text">
+									<button id="searchsubmit" value="Search" type="submit"></button>
 								</div>
 							</form>
 						</div>
 					</div>
 					<div class="position-sticky">
-						<a href="/courses"><h3 class="widget-title">Categories</h3></a>
+						<a href="/courses">
+							<h3 class="widget-title">Categories</h3>
+						</a>
 						<ul>
 							<% for (let i = 0; i < categories.length; i++) { %>
 							<li><a href="/courses?categories=<%= categories[i].slug %>"

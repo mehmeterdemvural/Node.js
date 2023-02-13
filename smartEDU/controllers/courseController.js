@@ -27,6 +27,8 @@ const createCourse = async (req, res) => {
 const getAllCourses = async (req, res) => {
   try {
     const categorySlug = await req.query.categories;
+    const searchQuery = await req.query.search;
+    console.log('SeracQuery', searchQuery);
 
     let category;
 
@@ -37,7 +39,23 @@ const getAllCourses = async (req, res) => {
       filter = { category: category._id };
     }
 
-    const courses = await Course.find(filter).sort({ createdAt: -1 });
+    if (searchQuery) {
+      filter = { name: searchQuery };
+      console.log('Filter', filter);
+    }
+
+    if (!categorySlug && !searchQuery) {
+      (filter.name = ''), (filter.category = null);
+    }
+
+    const courses = await Course.find({
+      $or: [
+        { name: { $regex: '.*' + filter.name + '.*', $options: 'i' } },
+        { category: filter.category },
+      ],
+    })
+      .populate(['category', 'createdBy'])
+      .sort({ createdAt: -1 });
 
     const categories = await Category.find({}).sort({ name: 1 });
 
@@ -58,15 +76,18 @@ const getAllCourses = async (req, res) => {
 
 const getCourse = async (req, res) => {
   try {
-    const course = await Course.findOne({ slug: req.params.slug }).populate(
-      'createdBy'
-    );
+    const user = await User.findById(req.session.userID);
+    const course = await Course.findOne({ slug: req.params.slug }).populate([
+      'createdBy',
+      'category',
+    ]);
     const categories = await Category.find({}).sort({ name: 1 });
     res.render('course', {
       status: 'success',
       page_name: 'courses',
       course,
       categories,
+      user,
     });
   } catch (error) {
     res.status(400).json({
@@ -89,4 +110,18 @@ const enrollCourse = async (req, res) => {
     });
   }
 };
-export { createCourse, getAllCourses, getCourse, enrollCourse };
+
+const releaseCourse = async (req, res) => {
+  try {
+    const user = await User.findById(req.session.userID);
+    await user.courses.pull({ _id: req.body.course_id });
+    await user.save();
+    res.redirect('/users/dashboard');
+  } catch (error) {
+    res.status(400).json({
+      status: 'fail',
+      error,
+    });
+  }
+};
+export { createCourse, getAllCourses, getCourse, enrollCourse, releaseCourse };
