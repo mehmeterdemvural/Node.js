@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   createCourse,
+  deleteCourse,
   enrollCourse,
   getAllCourses,
   getCourse,
@@ -13,6 +14,7 @@ const router = express.Router();
 router.route('/').get(getAllCourses);
 router.route('/').post(roleMiddleware(['teacher', 'admin']), createCourse);
 router.route('/course/:slug').get(getCourse);
+router.route('/course/:slug').delete(deleteCourse);
 router.route('/enroll').post(enrollCourse);
 router.route('/release').post(releaseCourse);
 

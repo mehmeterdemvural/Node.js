@@ -23,6 +23,14 @@ const createCourse = async (req, res) => {
   }
 };
 
+const deleteCourse = async (req, res) => {
+  try {
+    const course = await Course.findOneAndRemove({ slug: req.params.slug });
+    req.flash('success', `'${course.name}' has been removed succesfully !`);
+    res.status(200).redirect('/users/dashboard');
+  } catch (error) {}
+};
+
 const getAllCourses = async (req, res) => {
   try {
     const categorySlug = await req.query.categories;
@@ -55,7 +63,6 @@ const getAllCourses = async (req, res) => {
     })
       .populate(['category', 'createdBy'])
       .sort({ createdAt: -1 });
-  
 
     res.status(200).render('courses', {
       status: 'success',
@@ -63,7 +70,6 @@ const getAllCourses = async (req, res) => {
       courses,
       categories,
       categorySlug,
-
     });
   } catch (error) {
     res.status(400).json({
@@ -125,4 +131,11 @@ const releaseCourse = async (req, res) => {
     });
   }
 };
-export { createCourse, getAllCourses, getCourse, enrollCourse, releaseCourse };
+export {
+  createCourse,
+  getAllCourses,
+  getCourse,
+  enrollCourse,
+  releaseCourse,
+  deleteCourse,
+};
