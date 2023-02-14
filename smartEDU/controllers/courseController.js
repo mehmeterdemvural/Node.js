@@ -1,3 +1,5 @@
+import slugify from 'slugify';
+
 import { Course } from '../models/Course.js';
 import { Category } from '../models/Category.js';
 import { User } from '../models/User.js';
@@ -18,7 +20,7 @@ const createCourse = async (req, res) => {
       res.status(201).redirect('/users/dashboard');
     });
   } catch (err) {
-    req.flash('error', `Course creation was fail ! !`);
+    req.flash('error', `Course creation was failed ! !`);
     res.status(400).redirect('/users/dashboard');
   }
 };
@@ -28,7 +30,37 @@ const deleteCourse = async (req, res) => {
     const course = await Course.findOneAndRemove({ slug: req.params.slug });
     req.flash('success', `'${course.name}' has been removed succesfully !`);
     res.status(200).redirect('/users/dashboard');
-  } catch (error) {}
+  } catch (error) {
+    req.flash('error', `Course delete was failed ! !`);
+    res.status(400).redirect('/users/dashboard');
+  }
+};
+
+const updateCourse = async (req, res) => {
+  try {
+    let uploadedImage = await req.files.image;
+    let uploadPath = (await './public/uploads/') + uploadedImage.name;
+    uploadedImage.mv(uploadPath, async () => {
+      const course = await Course.updateOne(
+        { slug: req.params.slug },
+        {
+          name: req.body.name,
+          description: req.body.description,
+          image: '/uploads/' + uploadedImage.name,
+          category: req.body.category,
+          slug: slugify(req.body.name, {
+            lower: true,
+            strict: true,
+          }),
+        }
+      );
+      req.flash('success', `'${req.body.name}' has been updated succesfully !`);
+      res.status(200).redirect('/users/dashboard');
+    });
+  } catch (error) {
+    req.flash('error', `Course update was failed ! !`);
+    res.status(400).redirect('/users/dashboard');
+  }
 };
 
 const getAllCourses = async (req, res) => {
@@ -138,4 +170,5 @@ export {
   enrollCourse,
   releaseCourse,
   deleteCourse,
+  updateCourse,
 };

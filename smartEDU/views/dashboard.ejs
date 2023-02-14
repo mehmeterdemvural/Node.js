@@ -143,7 +143,8 @@
 								<% } %>
 							</div>
 							<div class="row">
-								<a href="" method="POST" class="col-4 btn btn-warning m-auto text-white">UPDATE</a>
+								<a href="" method="POST" class="col-4 btn btn-warning m-auto text-white"
+									data-toggle="modal" data-target="#updateCourse<%= courses[i]._id %>">UPDATE</a>
 								<a href="/courses/course/<%= courses[i].slug %>?_method=DELETE" method="POST"
 									class="col-4 btn btn-danger m-auto text-white"
 									onclick="return confirm('Are you sure?')">DELETE</a>
@@ -151,6 +152,72 @@
 						</div>
 					</div>
 				</div><!-- end col -->
+
+				<!-- UPDATE Modal -->
+				<div class="modal fade" id="updateCourse<%= courses[i]._id %>" tabindex="-1" role="dialog"
+					aria-labelledby="myModalLabel">
+					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+						<div class="modal-content">
+							<div class="modal-body customer-box">
+								<!-- Tab panes -->
+								<div class="tab-content">
+									<div class="tab-pane active" id="Login">
+										<form class="form-horizontal" encType="multipart/form-data" method="post"
+											action="/courses/course/<%= courses[i].slug %>?_method=PUT">
+											<div class="form-group">
+												<div class="col-sm-12">
+													<input type="text" name="name" class="form-control"
+														placeholder="Course Name" value="<%= courses[i].name %>">
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<input type="hidden" name="role" class="form-control"
+														value="<%= user.role %>">
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<textarea rows="8" name="description" class="form-control"
+														placeholder="Course Description"
+														required><%= courses[i].description %></textarea>
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<input class="form-control-file rounded-0" type="file" name="image">
+												</div>
+											</div>
+											<div class="form-group">
+												<div class="col-sm-12">
+													<select class="form-control" name="category"
+														value="<%= courses[i].categories %>">
+														<% for (let i=0; i< categories.length; i++) { %>
+														<option value="<%= categories[i]._id %>">
+															<%= categories[i].name %></option>
+														<% } %>
+													</select>
+												</div>
+											</div>
+											<div class="row">
+												<div class="col-sm-10">
+													<button type="submit" class="btn btn-light btn-radius btn-brd grd1">
+														Submit
+													</button>
+													<button type="submit" class="btn btn-light btn-radius btn-brd grd1"
+														data-dismiss="modal" aria-hidden="true">
+														Cancel
+													</button>
+												</div>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<% }} %>
 
 
