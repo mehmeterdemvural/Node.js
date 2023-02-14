@@ -9,9 +9,20 @@
 
             <div class="row">
                 <div class="col-xl-12 col-md-12 col-sm-12">
+                    <% if (flashMessages) { %>
+                    <% if (flashMessages.success) { %>
+                    <div class="alert alert-success text-center">
+                        <%= flashMessages.success %>
+                    </div>
+                    <% } else if (flashMessages.error) { %>
+                    <div class="alert alert-danger">
+                        <%= flashMessages.error %>
+                    </div>
+                    <% } %>
+                    <% } %>
                     <div class="contact_form ">
                         <div id="message"></div>
-                        <form action="/users/login" method="POST">
+                        <form action="/users/login" method="POST" novalidate>
                             <div class="row row-fluid">
                                 <div class="offset-1 col-lg-10 col-md-10 col-sm-10">
                                     <input type="email" name="email" id="email" class="form-control"
