@@ -1,5 +1,5 @@
 import express from 'express';
-import ejs from 'ejs';
+import ejs, { render } from 'ejs';
 import mongoose from 'mongoose';
 import fileupload from 'express-fileupload';
 import methodOverride from 'method-override';
@@ -70,6 +70,9 @@ app.use('/', pageRoute);
 app.use('/courses', courseRoute);
 app.use('/categories', categoryRoute);
 app.use('/users', userRoute);
+app.use('*', (req, res) => {
+  res.redirect('/');
+});
 
 const port = 3000;
 app.listen(port, () => {

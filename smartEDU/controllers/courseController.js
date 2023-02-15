@@ -14,7 +14,7 @@ const createCourse = async (req, res) => {
         description: req.body.description,
         image: '/uploads/' + uploadedImage.name,
         category: req.body.category,
-        createdBy: req.session.userID,
+        createdBy: req.body.ID,
       });
       req.flash('success', `Course creation was successful ! !`);
       res.status(201).redirect('/users/dashboard');

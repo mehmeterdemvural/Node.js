@@ -55,8 +55,8 @@
 								<% } %>
 								<form action="/courses/release" method="post">
 									<input type="hidden" name="course_id" value="<%= user.courses[i]._id %>">
-									<button type="submit"
-										class="btn btn-lg btn-danger text-white"><span>RELEASE<span></button>
+									<button style="width: 100%;" type="submit"
+										class="btn btn-danger text-white"><span>RELEASE<span></button>
 								</form>
 							</div>
 
@@ -247,6 +247,11 @@
 								</div>
 								<div class="form-group">
 									<div class="col-sm-12">
+										<input type="hidden" name="ID" class="form-control" value="<%= user._id %>">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
 										<textarea rows="8" name="description" class="form-control"
 											placeholder="Course Description" required></textarea>
 									</div>
@@ -261,6 +266,440 @@
 										<select class="form-control" name="category">
 											<% for (let i=0; i< categories.length; i++) { %>
 											<option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
+											<% } %>
+										</select>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-sm-10">
+										<button type="submit" class="btn btn-light btn-radius btn-brd grd1">
+											Submit
+										</button>
+										<button type="submit" class="btn btn-light btn-radius btn-brd grd1"
+											data-dismiss="modal" aria-hidden="true">
+											Cancel
+										</button>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<% } %>
+
+	<% if (user.role === 'admin') { %>
+
+	<div class="all-title-box">
+		<div class="container text-center">
+			<h1>Welcome <%= user.name %><span class="m_1"><%= user.role %></span></h1>
+		</div>
+	</div>
+
+	<div id="overviews" class="section wb">
+		<div class="container">
+			<div class="row">
+
+				<% if (flashMessages) { %>
+				<% if (flashMessages.success) { %>
+				<div class=" col-lg-12 text-center alert alert-success">
+					<%= flashMessages.success %>
+				</div>
+				<% } else if (flashMessages.error) { %>
+				<div class=" col-lg-12 text-center alert alert-danger">
+					<%= flashMessages.error %>
+				</div>
+				<% } %>
+				<% } %>
+
+				<!-- Modal Button -->
+				<div class="col-lg-12 text-center ">
+					<button class="btn btn-lg btn-warning rounded-0 text-white" href="#" data-toggle="modal"
+						data-target="#addCourse"><span>CREATE NEW
+							COURSE</span></button>
+				</div>
+
+
+
+
+			</div><!-- end col -->
+
+			<!-- Student List -->
+			<div class="row mt-5 ">
+				<h1 class="col-12 text-center">Students</h1>
+				<table class="table table-striped table-dark table-sm text-center">
+					<thead>
+						<tr>
+							<th scope="row">#</th>
+							<th scope="col">ID</th>
+							<th scope="col">Name</th>
+							<th scope="col">Email</th>
+							<th scope="col">Courses</th>
+							<th scope="col">Created At</th>
+							<th scope="col">Update</th>
+							<th scope="col">Delete</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% for(let i = 0; i < students.length; i ++) { %>
+						<tr>
+							<td class="align-middle" scope="row"> <%= i + 1 %> </td>
+							<td class="align-middle" scope="row"><%= students[i]._id %></td>
+							<td class="align-middle"><%= students[i].name %></td>
+							<td class="align-middle"><%= students[i].email %></td>
+							<td class="align-middle">
+								<ul class="my-auto list-group">
+									<% for (let j = 0; j < students[i].courses.length; j++) { %>
+									<a href="/courses/course/<%= students[i].courses[j].slug %>"
+										class="list-group-item list-group-item-action list-group-item-dark"><%= students[i].courses[j].name %></a>
+
+									<% } %>
+								</ul>
+							<td class="align-middle"><%= students[i].createdAt.toLocaleString() %></td>
+							</td>
+							<td class="align-middle" scope="row">
+								<button class="btn btn-warning" href="#" data-toggle="modal"
+									data-target="#updateStudent<%= students[i]._id %>"><span>UPDATE</span></button>
+							</td>
+							<td class="align-middle" scope="row">
+								<a onclick="return confirm('Student will be deleted. Are you sure?')"
+									class="btn btn-danger"
+									href="/users/deleteStudent/<%= students[i]._id %>?_method=DELETE">DELETE
+								</a>
+							</td>
+						</tr>
+						<!-- Modal -->
+						<div class="modal fade bd-example-modal-sm" id="updateStudent<%= students[i]._id %>"
+							tabindex="-1" role="dialog" aria-labelledby="updateStudentModalLabel" role="dialog">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<form action="/users/updateStudent/<%= students[i]._id %>?_method=PUT"
+										method="POST">
+										<div class="modal-header text-center ">
+											<h1 class="modal-title " id="updateStudentModalLabel">Update Student
+											</h1>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body row row-fluid">
+											<div class=" col-lg-12 col-md-12 col-sm-12 form-group">
+												<label for="name">Name Update</label>
+												<input type="text" name="name" id="name" class="form-control"
+													placeholder="Name" value="<%= students[i].name %>">
+											</div>
+											<hr>
+											<div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+												<label for="email">Email Update</label>
+												<input type="email" name="email" id="email" class="form-control"
+													placeholder="Email" value="<%= students[i].email %>">
+											</div>
+											<hr>
+											<div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+												<label for="role">Select Role</label>
+
+												<select class="form-control" name="role">
+													<option selected>student</option>
+													<option>teacher</option>
+												</select>
+											</div>
+											<div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+												<label>Select Courses</label>
+												<div class="custom-control custom-checkbox">
+													<div class="row">
+														<% for(let k = 0; k < allCourses.length; k++) { %>
+														<div class="col-4">
+															<input type="checkbox" name="courses"
+																value="<%= allCourses[k]._id %>">
+															<label><%= allCourses[k].name %></label>
+														</div>
+														<% } %>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary"
+												data-dismiss="modal">Close</button>
+											<button type="submit" class="btn btn-warning">Save changes</button>
+										</div>
+									</form>
+								</div>
+							</div>
+
+						</div>
+						<% } %>
+
+					</tbody>
+				</table>
+			</div>
+
+			<!-- // Teacher List -->
+			<div class="row mt-5 ">
+				<h1 class="col-12 text-center">Teachers</h1>
+				<table class="table table-striped table-dark table-sm text-center">
+					<thead>
+						<tr>
+							<th scope="row">#</th>
+							<th scope="col">ID</th>
+							<th scope="col">Name</th>
+							<th scope="col">Email</th>
+							<th scope="col">Courses</th>
+							<th scope="col">Created At</th>
+							<th scope="col">Update</th>
+							<th scope="col">Delete</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% for(let i = 0; i < teachers.length; i ++) { %>
+						<tr>
+							<td class="align-middle" scope="row"> <%= i + 1 %> </td>
+							<td class="align-middle" scope="row"><%= teachers[i]._id %></td>
+							<td class="align-middle"><%= teachers[i].name %></td>
+							<td class="align-middle"><%= teachers[i].email %></td>
+							<td class="align-middle">
+								<ul class="my-auto list-group">
+									<% for (let j = 0; j < teachers[i].courses.length; j++) { %>
+									<a href="/courses/course/<%= teachers[i].courses[j].slug %>"
+										class="list-group-item list-group-item-action list-group-item-dark"><%= teachers[i].courses[j].name %></a>
+
+									<% } %>
+								</ul>
+							<td class="align-middle"><%= teachers[i].createdAt.toLocaleString() %></td>
+							</td>
+							<td class="align-middle" scope="row">
+								<button class="btn btn-warning" href="#" data-toggle="modal"
+									data-target="#updateTeacher<%= teachers[i]._id %>"><span>UPDATE</span></button>
+							</td>
+							<td class="align-middle" scope="row">
+								<a onclick="return confirm('Teacher will be deleted. Are you sure?')"
+									class="btn btn-danger"
+									href="/users/teacher/<%= teachers[i]._id %>?_method=DELETE">DELETE
+								</a>
+							</td>
+						</tr>
+						<!-- Modal -->
+						<div class="modal fade bd-example-modal-sm" id="updateTeacher<%= teachers[i]._id %>"
+							tabindex="-1" role="dialog" aria-labelledby="updateTeacherModalLabel" role="dialog">
+							<div class="modal-dialog modal-lg">
+								<div class="modal-content">
+									<form action="/users/teacher/<%= teachers[i]._id %>?_method=PUT"
+										method="POST">
+										<div class="modal-header text-center ">
+											<h1 class="modal-title " id="updateTeacherModalLabel">Update Teacher
+											</h1>
+											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+												<span aria-hidden="true">&times;</span>
+											</button>
+										</div>
+										<div class="modal-body row row-fluid">
+											<div class=" col-lg-12 col-md-12 col-sm-12 form-group">
+												<label for="name">Name Update</label>
+												<input type="text" name="name" id="name" class="form-control"
+													placeholder="Name" value="<%= teachers[i].name %>">
+											</div>
+											<hr>
+											<div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+												<label for="email">Email Update</label>
+												<input type="email" name="email" id="email" class="form-control"
+													placeholder="Email" value="<%= teachers[i].email %>">
+											</div>
+											<hr>
+											<div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+												<label for="role">Select Role</label>
+
+												<select class="form-control" name="role">
+													<option>student</option>
+													<option selected>teacher</option>
+												</select>
+											</div>
+											<!-- <div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+												<label>Select Courses</label>
+												<div class="custom-control custom-checkbox">
+													<div class="row">
+														<% for(let k = 0; k < allCourses.length; k++) { %>
+														<div class="col-4">
+															<input type="checkbox" name="courses"
+																value="<%= allCourses[k]._id %>">
+															<label><%= allCourses[k].name %></label>
+														</div>
+														<% } %>
+													</div>
+												</div>
+											</div> -->
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary"
+												data-dismiss="modal">Close</button>
+											<button type="submit" class="btn btn-warning">Save changes</button>
+										</div>
+									</form>
+								</div>
+							</div>
+
+						</div>
+
+						<% } %>
+
+					</tbody>
+				</table>
+			</div>
+
+
+		</div><!-- end row -->
+
+
+
+		<div class="row mt-5">
+
+			<% if (courses) { for (let i=0; i < courses.length; i++){ %>
+			<div class="col-lg-6 col-md-6 col-12">
+				<div class="course-item mb-5">
+					<div class="image-blog">
+						<img style="height: 250px;" src="<%= courses[i].image %>" alt="" class="img-fluid">
+					</div>
+					<div class="course-br">
+						<div class="course-title">
+							<h2><a href="/courses/course/<%= courses[i].slug %>" title=""><%= courses[i].name %></a>
+							</h2>
+						</div>
+						<div class="course-desc">
+							<% if(courses[i].description.length > 150) { %>
+							<p><%= courses[i].description.substring(0, 150) + ' ...' %></p>
+							<% } else { %>
+							<p><%= courses[i].description %></p>
+							<% } %>
+						</div>
+						<div class="row">
+							<a href="" method="POST" class="col-4 btn btn-warning m-auto text-white" data-toggle="modal"
+								data-target="#updateCourse<%= courses[i]._id %>">UPDATE</a>
+							<a href="/courses/course/<%= courses[i].slug %>?_method=DELETE" method="POST"
+								class="col-4 btn btn-danger m-auto text-white"
+								onclick="return confirm('Are you sure?')">DELETE</a>
+						</div>
+					</div>
+				</div>
+			</div><!-- end col -->
+
+			<!-- UPDATE Modal -->
+			<div class="modal fade" id="updateCourse<%= courses[i]._id %>" tabindex="-1" role="dialog"
+				aria-labelledby="myModalLabel">
+				<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+					<div class="modal-content">
+						<div class="modal-body customer-box">
+							<!-- Tab panes -->
+							<div class="tab-content">
+								<div class="tab-pane active" id="Login">
+									<form class="form-horizontal" encType="multipart/form-data" method="post"
+										action="/courses/course/<%= courses[i].slug %>?_method=PUT">
+										<div class="form-group">
+											<div class="col-sm-12">
+												<input type="text" name="name" class="form-control"
+													placeholder="Course Name" value="<%= courses[i].name %>">
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-12">
+												<input type="hidden" name="role" class="form-control"
+													value="<%= user.role %>">
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-12">
+												<textarea rows="8" name="description" class="form-control"
+													placeholder="Course Description"
+													required><%= courses[i].description %></textarea>
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-12">
+												<input class="form-control-file rounded-0" type="file" name="image">
+											</div>
+										</div>
+										<div class="form-group">
+											<div class="col-sm-12">
+												<select class="form-control" name="category"
+													value="<%= courses[i].categories %>">
+													<% for (let i=0; i< categories.length; i++) { %>
+													<option value="<%= categories[i]._id %>">
+														<%= categories[i].name %></option>
+													<% } %>
+												</select>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-sm-10">
+												<button type="submit" class="btn btn-light btn-radius btn-brd grd1">
+													Submit
+												</button>
+												<button type="submit" class="btn btn-light btn-radius btn-brd grd1"
+													data-dismiss="modal" aria-hidden="true">
+													Cancel
+												</button>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<% }} %>
+
+
+
+		</div><!-- end row -->
+	</div><!-- end container -->
+	</div><!-- end section -->
+
+	<!-- ADD Modal -->
+	<div class="modal fade" id="addCourse" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+			<div class="modal-content">
+				<div class="modal-body customer-box">
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div class="tab-pane active" id="Login">
+							<form class="form-horizontal" encType="multipart/form-data" method="post" action="/courses">
+								<div class="form-group">
+									<div class="col-sm-12">
+										<input type="text" name="name" class="form-control" placeholder="Course Name">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
+										<input type="hidden" name="role" class="form-control" value="<%= user.role %>">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
+										<textarea rows="8" name="description" class="form-control"
+											placeholder="Course Description" required></textarea>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
+										<input class="form-control-file rounded-0" type="file" name="image">
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
+										<select class="form-control" name="category">
+											<% for (let i=0; i< categories.length; i++) { %>
+											<option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
+											<% } %>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-sm-12">
+										<select class="form-control" name="ID">
+											<% for (let i=0; i< teachers.length; i++) { %>
+											<option value="<%= teachers[i]._id %>"><%= teachers[i].name %></option>
 											<% } %>
 										</select>
 									</div>

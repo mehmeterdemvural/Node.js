@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
+import { User } from '../models/User.js';
 
-const getIndexPage = (req, res) => {
-  console.log(req.session.userID);
+const getIndexPage = async (req, res) => {
   res.status(200).render('index', {
     page_name: 'index',
   });

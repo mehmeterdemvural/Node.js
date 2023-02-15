@@ -4,11 +4,18 @@ import { body } from 'express-validator';
 import { User } from '../models/User.js';
 import {
   createUser,
+  deleteStudent,
+  deleteTeacher,
   getDashboardPage,
   loginUser,
   logoutUser,
+  updateStudent,
+  updateTeacher,
 } from '../controllers/authController.js';
 import authMiddleware from '../middlewares/authMiddleware.js';
+import roleMiddleware from '../middlewares/roleMiddleware.js';
+
+//Route
 
 const router = express.Router();
 
@@ -30,6 +37,10 @@ router.route('/signup').post(
   createUser
 );
 router.route('/login').post(loginUser);
+router.route('/student/:id').put(roleMiddleware(['admin']), updateStudent);
+router.route('/student/:id').delete(roleMiddleware(['admin']), deleteStudent);
+router.route('/teacher/:id').put(roleMiddleware(['admin']), updateTeacher);
+router.route('/teacher/:id').delete(roleMiddleware(['admin']), deleteTeacher);
 router.route('/logout').get(logoutUser);
 router.route('/dashboard').get(authMiddleware, getDashboardPage);
 
