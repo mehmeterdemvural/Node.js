@@ -14,7 +14,7 @@ const createCourse = async (req, res) => {
         description: req.body.description,
         image: '/uploads/' + uploadedImage.name,
         category: req.body.category,
-        createdBy: req.body.ID,
+        createdBy: req.body.ID || req.session.userID,
       });
       req.flash('success', `Course creation was successful ! !`);
       res.status(201).redirect('/users/dashboard');
@@ -48,6 +48,7 @@ const updateCourse = async (req, res) => {
           description: req.body.description,
           image: '/uploads/' + uploadedImage.name,
           category: req.body.category,
+          createdBy: req.body.ID || req.session.userID,
           slug: slugify(req.body.name, {
             lower: true,
             strict: true,
@@ -114,6 +115,7 @@ const getAllCourses = async (req, res) => {
 const getCourse = async (req, res) => {
   try {
     const user = await User.findById(req.session.userID);
+    const teachers = await User.find({ role: 'teacher' });
     const course = await Course.findOne({ slug: req.params.slug }).populate([
       'createdBy',
       'category',
@@ -127,6 +129,7 @@ const getCourse = async (req, res) => {
       categories,
       user,
       userCount,
+      teachers,
     });
   } catch (error) {
     res.status(400).json({

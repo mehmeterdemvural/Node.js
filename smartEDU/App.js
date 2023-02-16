@@ -70,9 +70,9 @@ app.use('/', pageRoute);
 app.use('/courses', courseRoute);
 app.use('/categories', categoryRoute);
 app.use('/users', userRoute);
-app.use('*', (req, res) => {
-  res.redirect('/');
-});
+// app.use('*', (req, res) => {
+//   res.redirect('/');
+// });
 
 const port = 3000;
 app.listen(port, () => {

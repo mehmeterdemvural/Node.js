@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypt';
+import bcrypt, { hash } from 'bcrypt';
 import { validationResult } from 'express-validator';
 
 import { User } from '../models/User.js';
@@ -6,17 +6,14 @@ import { Category } from '../models/Category.js';
 import { Course } from '../models/Course.js';
 
 const createUser = async (req, res) => {
+  const user = await User.findById(req.session.userID);
   const errors = validationResult(req);
+  const newUser = req.body;
   try {
     if (!errors.array().length > 0) {
-      await bcrypt.hash(req.body.password, 10, async function (err, hash) {
-        let user = await req.body;
-
-        user.password = hash;
-
-        await User.create(user);
-      });
-      res.status(201).redirect('/login');
+      await User.create(newUser);
+      req.flash('success', `"${req.body.name}" has been created succesfully !`);
+      res.status(201).redirect('/users/dashboard');
     } else {
       reject();
     }
@@ -78,19 +75,21 @@ const updateTeacher = async (req, res) => {
 
 const deleteTeacher = async (req, res) => {
   try {
-    // const teacher = await User.findOneAndRemove({ _id: req.params.id });
-    // const courses = await Course.deleteMany({ createdBy: req.params.id });
-    const course = await Course.find({ createdBy: req.params.id });
-    const coursesID = await course.map((course) => course._id);
-    const students = await User.find({ role: 'student' });
-    const result = students.map((student) => {
-      for (let i = 0; i < student.courses.length; i++) {
-        if (coursesID.includes(student.courses[i])) {
-          return student._id;
-        }
-      }
-    });
-    console.log(result);
+    const teacher = await User.findOneAndRemove({ _id: req.params.id });
+    const courses = await Course.deleteMany({ createdBy: req.params.id });
+    // await user.courses.pull({ _id: req.body.course_id });
+    // const students = await User.find({ role: 'student' });
+    // let result = [];
+    // const course = await Course.find({ createdBy: req.params.id });
+    // const coursesID = await course.map((course) => course._id);
+    // for (let i = 0; i < students.length; i++) {
+    //   for (let k = 0; k < coursesID.length; k++) {
+    //     if (students[i].courses.includes(coursesID[k])) {
+    //       console.log(coursesID[k], students[i].courses);
+    //     }
+    //   }
+    // }
+    // console.log(result);
 
     req.flash('success', `Teacher has been removed succesfully !`);
     res.status(200).redirect('/users/dashboard');
@@ -145,11 +144,11 @@ const logoutUser = async (req, res) => {
 const getDashboardPage = async (req, res) => {
   try {
     const user = await User.findById(req.session.userID).populate('courses');
-    const categories = await Category.find({}).sort({ name: 1 });
+    const allCategories = await Category.find().sort({ name: 1 });
     const courses = await Course.find({ createdBy: user }).sort({
       createdAt: -1,
     });
-    const allCourses = await Course.find({}).sort({ name: 1 });
+    const allCourses = await Course.find({}).sort({ name: 1 }).populate(['createdBy', 'category'])
     const students = await User.find({ role: 'student' })
       .sort('name')
       .populate('courses');
@@ -158,7 +157,7 @@ const getDashboardPage = async (req, res) => {
     res.status(200).render('dashboard', {
       page_name: 'dashboard',
       user,
-      categories,
+      allCategories,
       courses,
       students,
       teachers,

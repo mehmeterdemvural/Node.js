@@ -11,9 +11,17 @@ const CategorySchema = new Schema({
     unique: true,
     required: true,
   },
+  courses: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Course',
+  },
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
   },
   slug: {
     type: String,
@@ -21,13 +29,13 @@ const CategorySchema = new Schema({
   },
 });
 
-CategorySchema.pre('validate', function (next) {
-  this.slug = slugify(this.name, {
-    lower: true,
-    strict: true,
-  });
-  next();
-});
+// CategorySchema.pre('validate', function (next) {
+//   this.slug = slugify(this.name, {
+//     lower: true,
+//     strict: true,
+//   });
+//   next();
+// });
 
 const Category = mongoose.model('Category', CategorySchema);
 
