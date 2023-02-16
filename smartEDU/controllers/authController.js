@@ -1,4 +1,4 @@
-import bcrypt, { hash } from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { validationResult } from 'express-validator';
 
 import { User } from '../models/User.js';
@@ -6,12 +6,19 @@ import { Category } from '../models/Category.js';
 import { Course } from '../models/Course.js';
 
 const createUser = async (req, res) => {
-  const user = await User.findById(req.session.userID);
   const errors = validationResult(req);
   const newUser = req.body;
   try {
     if (!errors.array().length > 0) {
       await User.create(newUser);
+      const user = await User.findOne({ name: newUser.name });
+      await Course.updateMany(
+        { _id: newUser.courses },
+        {
+          $push: { students: user._id },
+        }
+      );
+
       req.flash('success', `"${req.body.name}" has been created succesfully !`);
       res.status(201).redirect('/users/dashboard');
     } else {
@@ -27,13 +34,25 @@ const createUser = async (req, res) => {
 
 const updateStudent = async (req, res) => {
   try {
-    const student = await User.updateOne(
+    await Course.updateMany(
+      { students: req.params.id },
+      {
+        $pull: { students: req.params.id },
+      }
+    );
+    await User.updateOne(
       { _id: req.params.id },
       {
         name: req.body.name,
         email: req.body.email,
         role: req.body.role,
         courses: req.body.courses,
+      }
+    );
+    await Course.updateMany(
+      { _id: req.body.courses },
+      {
+        $push: { students: req.params.id },
       }
     );
     req.flash('success', `'${req.body.name}' has been updated succesfully !`);
@@ -46,8 +65,14 @@ const updateStudent = async (req, res) => {
 
 const deleteStudent = async (req, res) => {
   try {
-    const student = await User.findOneAndRemove({ _id: req.params.id });
-    req.flash('success', `'${student.name}' has been removed succesfully !`);
+    await User.findOneAndRemove({ _id: req.params.id });
+    await Course.updateMany(
+      { students: req.params.id },
+      {
+        $pull: { students: req.params.id },
+      }
+    );
+    req.flash('success', `Student has been removed succesfully !`);
     res.status(200).redirect('/users/dashboard');
   } catch (error) {
     req.flash('error', `Student delete was failed ! !`);
@@ -57,7 +82,7 @@ const deleteStudent = async (req, res) => {
 
 const updateTeacher = async (req, res) => {
   try {
-    const teacher = await User.updateOne(
+    await User.updateOne(
       { _id: req.params.id },
       {
         name: req.body.name,
@@ -144,15 +169,22 @@ const logoutUser = async (req, res) => {
 const getDashboardPage = async (req, res) => {
   try {
     const user = await User.findById(req.session.userID).populate('courses');
-    const allCategories = await Category.find().sort({ name: 1 });
+    const allCategories = await Category.find()
+      .sort('name')
+      .populate('courses');
     const courses = await Course.find({ createdBy: user }).sort({
       createdAt: -1,
     });
-    const allCourses = await Course.find({}).sort({ name: 1 }).populate(['createdBy', 'category'])
+    const allCourses = await Course.find({})
+      .sort({ name: 1 })
+      .populate(['createdBy', 'category']);
     const students = await User.find({ role: 'student' })
       .sort('name')
       .populate('courses');
-    const teachers = await User.find({ role: 'teacher' }).sort('name');
+    const teachers = await User.find({ role: 'teacher' })
+      .sort('name')
+      .populate('courses');
+    console.log(teachers[0].courses[0]);
 
     res.status(200).render('dashboard', {
       page_name: 'dashboard',

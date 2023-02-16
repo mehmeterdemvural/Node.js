@@ -3,7 +3,7 @@
 <body class="host_version">
 	<%- include('./partials/_navigation.ejs') %>
 
-	<% if (user.role === 'student') { %>
+	<% if (user && user.role === 'student') { %>
 
 	<div class="all-title-box">
 
@@ -72,7 +72,7 @@
 	<% } %>
 
 
-	<% if (user.role === 'teacher') { %>
+	<% if (user && user.role === 'teacher') { %>
 
 	<div class="all-title-box">
 		<div class="container text-center">
@@ -156,7 +156,7 @@
 
 	<% } %>
 
-	<% if (user.role === 'admin') { %>
+	<% if (user && user.role === 'admin') { %>
 
 	<div class="all-title-box">
 		<div class="container text-center">
@@ -389,20 +389,28 @@
 													<option selected>teacher</option>
 												</select>
 											</div>
-											<!-- <div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
+											<div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
 												<label>Select Courses</label>
 												<div class="custom-control custom-checkbox">
 													<div class="row">
+														<% for(let m = 0; m < teachers[i].courses.length; m++) { %>
 														<% for(let k = 0; k < allCourses.length; k++) { %>
 														<div class="col-4">
+															<% if (teachers[i].courses[m].name == allCourses[k].name) { %>
+															<input type="checkbox" name="courses"
+																value="<%= allCourses[k]._id %>" checked>
+															<% } else { %>
 															<input type="checkbox" name="courses"
 																value="<%= allCourses[k]._id %>">
+															<% } %>
+
 															<label><%= allCourses[k].name %></label>
 														</div>
 														<% } %>
+														<% } %>
 													</div>
 												</div>
-											</div> -->
+											</div>
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-secondary"
@@ -446,7 +454,14 @@
 							<td class="align-middle"><%= allCategories[i].createdBy %></td>
 							<td class="align-middle">
 								<ul class="my-auto list-group">
-
+									<% if(allCategories[i].courses) { %>
+									<% for (let j = 0; j < allCategories[i].courses.length; j++) { %>
+									<a href="/courses/course/<%= allCategories[i].courses[j].slug %>"
+										class="list-group-item list-group-item-action list-group-item-dark">
+										<%= allCategories[i].courses[j].name %>
+									</a>
+									<% } %>
+									<% } %>
 								</ul>
 							</td>
 							<td class="align-middle"><%= allCategories[i].createdAt.toLocaleString() %></td>
@@ -537,8 +552,20 @@
 							<td class="align-middle" scope="row"> <%= i + 1 %> </td>
 							<td class="align-middle" scope="row"><%= allCourses[i]._id %></td>
 							<td class="align-middle"><%= allCourses[i].name %></td>
-							<td class="align-middle"><%= allCourses[i].category.name %></td>
-							<td class="align-middle"><%= allCourses[i].createdBy.name %></td>
+							<td class="align-middle">
+								<% if(allCourses[i].category) { %>
+								<%= allCourses[i].category.name %>
+								<% } %>
+							</td>
+							<td class="align-middle">
+								<ul class="my-auto list-group">
+									<% for(let m = 0; m < allCourses[i].createdBy.length; m++) { %>
+									<a>
+										<%= allCourses[i].createdBy[0].name %>
+									</a>
+									<%  } %>
+								</ul>
+							</td>
 							<td class="align-middle"><%= allCourses[i].createdAt.toLocaleString() %></td>
 							<td class="align-middle" scope="row">
 								<a class="btn btn-success" href="/courses/course/<%= allCourses[i].slug %>">DETAILS
@@ -736,7 +763,7 @@
 
 						<div class="col-lg-12 col-md-12 col-sm-12 form-group">
 							<label for="description">Enter Course Description</label>
-							<textarea rows="8" name="description" class="form-control" placeholder="Course Description"
+							<textarea rows="6" name="description" class="form-control" placeholder="Course Description"
 								required></textarea>
 						</div>
 
@@ -755,7 +782,7 @@
 								<% } %>
 							</select>
 						</div>
-						<% if (user.role === 'admin') { %>
+						<% if (user && user.role === 'admin') { %>
 						<div class="col-lg-12 col-md-12 col-sm-12 form-group">
 							<label for="ID">Select Course Teacher</label>
 							<select class="form-control" name="ID">

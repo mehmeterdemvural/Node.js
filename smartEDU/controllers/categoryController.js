@@ -1,17 +1,14 @@
 import slugify from 'slugify';
 import { Category } from '../models/Category.js';
+import { Course } from '../models/Course.js';
 
 const createCategory = async (req, res) => {
   try {
     const category = await {
-      name: req.body.name,
-      slug: slugify(req.body.name, {
-        lower: true,
-        strict: true,
-      }),
+      ...req.body,
       createdBy: req.session.userID,
     };
-
+    console.log(category);
     await Category.create(category);
     req.flash('success', `'${req.body.name}' has been created succesfully !`);
     res.status(201).redirect('/users/dashboard');
@@ -44,7 +41,15 @@ const updateCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
   try {
-    const course = await Category.findOneAndRemove({ _id: req.params.id });
+    const categoryOne = await Category.findOne({ _id: req.params.id });
+    await Category.findOneAndRemove({ _id: req.params.id });
+    await Course.updateMany(
+      { category: categoryOne._id },
+      {
+        $pull: { category: categoryOne._id },
+      }
+    );
+
     req.flash('success', `Category has been removed succesfully !`);
     res.status(200).redirect('/users/dashboard');
   } catch (error) {
