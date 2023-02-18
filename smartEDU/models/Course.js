@@ -20,22 +20,28 @@ const CourseSchema = new Schema({
     type: String,
     required: true,
   },
-  category: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
-  },
+  category: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
+    },
+  ],
   students: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
-  createdBy: [
+  teachers: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
     },
   ],
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   createdAt: {
     type: Date,
     default: Date.now,

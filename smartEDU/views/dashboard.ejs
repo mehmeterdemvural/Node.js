@@ -227,9 +227,9 @@
 							<td class="align-middle"><%= students[i].email %></td>
 							<td class="align-middle">
 								<ul class="my-auto list-group">
-									<% for (let j = 0; j < students[i].courses.length; j++) { %>
-									<a href="/courses/course/<%= students[i].courses[j].slug %>"
-										class="list-group-item list-group-item-action list-group-item-dark"><%= students[i].courses[j].name %></a>
+									<% for (let j = 0; j < students[i].courses.learn.length; j++) { %>
+									<a href="/courses/course/<%= students[i].courses.learn[j].slug %>"
+										class="list-group-item list-group-item-action list-group-item-dark"><%= students[i].courses.learn[j].name %></a>
 
 									<% } %>
 								</ul>
@@ -246,7 +246,7 @@
 								</a>
 							</td>
 						</tr>
-						<!-- Modal -->
+						<!-- Update Student Modal -->
 						<div class="modal fade bd-example-modal-sm" id="updateStudent<%= students[i]._id %>"
 							tabindex="-1" role="dialog" aria-labelledby="updateStudentModalLabel" role="dialog">
 							<div class="modal-dialog modal-lg">
@@ -284,11 +284,16 @@
 												<label>Select Courses</label>
 												<div class="custom-control custom-checkbox">
 													<div class="row">
-														<% for(let k = 0; k < allCourses.length; k++) { %>
+														<% for (let m = 0; m < allCourses.length; m++) { %>
 														<div class="col-4">
 															<input type="checkbox" name="courses"
-																value="<%= allCourses[k]._id %>">
-															<label><%= allCourses[k].name %></label>
+																id="<%= allCourses[m]._id %>"
+																value="<%= allCourses[m]._id %>"
+																<% for (let n = 0; n < students[i].courses.length; n++) { %>
+																<% if (students[i].courses[n].name === allCourses[m].name ) { %>
+																checked <% } %> <% } %>>
+															<label
+																for="<%= allCourses[m]._id %>"><%= allCourses[m].name %></label>
 														</div>
 														<% } %>
 													</div>
@@ -336,9 +341,9 @@
 							<td class="align-middle"><%= teachers[i].email %></td>
 							<td class="align-middle">
 								<ul class="my-auto list-group">
-									<% for (let j = 0; j < teachers[i].courses.length; j++) { %>
-									<a href="/courses/course/<%= teachers[i].courses[j].slug %>"
-										class="list-group-item list-group-item-action list-group-item-dark"><%= teachers[i].courses[j].name %></a>
+									<% for (let j = 0; j < teachers[i].courses.teach.length; j++) { %>
+									<a href="/courses/course/<%= teachers[i].courses.teach[j].slug %>"
+										class="list-group-item list-group-item-action list-group-item-dark"><%= teachers[i].courses.teach[j].name %></a>
 
 									<% } %>
 								</ul>
@@ -393,20 +398,17 @@
 												<label>Select Courses</label>
 												<div class="custom-control custom-checkbox">
 													<div class="row">
-														<% for(let m = 0; m < teachers[i].courses.length; m++) { %>
-														<% for(let k = 0; k < allCourses.length; k++) { %>
+														<% for (let m = 0; m < allCourses.length; m++) { %>
 														<div class="col-4">
-															<% if (teachers[i].courses[m].name == allCourses[k].name) { %>
 															<input type="checkbox" name="courses"
-																value="<%= allCourses[k]._id %>" checked>
-															<% } else { %>
-															<input type="checkbox" name="courses"
-																value="<%= allCourses[k]._id %>">
-															<% } %>
-
-															<label><%= allCourses[k].name %></label>
+																id="<%= allCourses[m]._id %>"
+																value="<%= allCourses[m]._id %>"
+																<% for (let n = 0; n < teachers[i].courses.length; n++) { %>
+																<% if (teachers[i].courses[n].name === allCourses[m].name ) { %>
+																checked <% } %> <% } %>>
+															<label
+																for="<%= allCourses[m]._id %>"><%= allCourses[m].name %></label>
 														</div>
-														<% } %>
 														<% } %>
 													</div>
 												</div>
@@ -451,7 +453,7 @@
 							<td class="align-middle" scope="row"> <%= i + 1 %> </td>
 							<td class="align-middle" scope="row"><%= allCategories[i]._id %></td>
 							<td class="align-middle"><%= allCategories[i].name %></td>
-							<td class="align-middle"><%= allCategories[i].createdBy %></td>
+							<td class="align-middle"><%= allCategories[i].createdBy.name %></td>
 							<td class="align-middle">
 								<ul class="my-auto list-group">
 									<% if(allCategories[i].courses) { %>
@@ -543,6 +545,8 @@
 							<th scope="col">Category</th>
 							<th scope="col">Teacher</th>
 							<th scope="col">Created At</th>
+							<th scope="col">Created By</th>
+							<th scope="col">Students</th>
 							<th scope="col">Details</th>
 						</tr>
 					</thead>
@@ -553,76 +557,60 @@
 							<td class="align-middle" scope="row"><%= allCourses[i]._id %></td>
 							<td class="align-middle"><%= allCourses[i].name %></td>
 							<td class="align-middle">
-								<% if(allCourses[i].category) { %>
-								<%= allCourses[i].category.name %>
+								<% for(let k = 0 ; k < allCourses[i].category.length; k++) { %>
+								<a><%= allCourses[i].category[k].name %></a>
 								<% } %>
 							</td>
 							<td class="align-middle">
 								<ul class="my-auto list-group">
-									<% for(let m = 0; m < allCourses[i].createdBy.length; m++) { %>
+									<% for(let m = 0; m < allCourses[i].teachers.length; m++) { %>
 									<a>
-										<%= allCourses[i].createdBy[0].name %>
+										<%= allCourses[i].teachers[m].name %>
 									</a>
 									<%  } %>
 								</ul>
 							</td>
 							<td class="align-middle"><%= allCourses[i].createdAt.toLocaleString() %></td>
+							<td class="align-middle"><%= allCourses[i].createdBy.name %></td>
+							<td class="align-middle" scope="row">
+								<button class="btn btn-info" data-toggle="modal"
+									data-target="#showStudents<%= allCourses[i]._id %>">STUDENTS
+								</button>
+							</td>
 							<td class="align-middle" scope="row">
 								<a class="btn btn-success" href="/courses/course/<%= allCourses[i].slug %>">DETAILS
 								</a>
 							</td>
 						</tr>
-
-
-						<!-- Uptade Category Modal -->
-						<div class="modal fade bd-example-modal-sm" id="updateCategory<%= allCourses[i]._id %>"
-							tabindex="-1" role="dialog" aria-labelledby="updateCategoryModalLabel" role="dialog">
-							<div class="modal-dialog modal-lg">
+						<!-- Course List Modal -->
+						<div class="modal fade bd-example-modal-sm" id="showStudents<%= allCourses[i]._id %>"
+							tabindex="-1" role="dialog" aria-labelledby="showStudentsModalLabel">
+							<div class="modal-dialog modal-lg" role="document">
 								<div class="modal-content">
-									<form action="/categories/<%= allCourses[i]._id %>?_method=PUT" method="POST">
-										<div class="modal-header text-center ">
-											<h1 class="modal-title " id="updateCategoryModalLabel">Update Category
-											</h1>
-											<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-												<span aria-hidden="true">&times;</span>
-											</button>
-										</div>
-										<div class="modal-body row row-fluid">
-											<div class=" col-lg-12 col-md-12 col-sm-12 form-group">
-												<label for="name">Category Name Update</label>
-												<input type="text" name="name" id="name" class="form-control"
-													placeholder="Name" value="<%= allCourses[i].name %>">
-											</div>
-											<hr>
+									<div class="modal-header text-center ">
+										<h1 class="modal-title " id="showStudentsModalLabel">Students
+										</h1>
+										<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+											<span aria-hidden="true">&times;</span>
+										</button>
+									</div>
+									<div class="modal-body row row-fluid">
+										<div class=" col-lg-12 col-md-12 col-sm-12 form-group">
+											<% for(let s = 0; s < allCourses[i].students.length; s++ ) { %>
+											<p><%= allCourses[i].students[s].name %></p>
+											<% } %>
 
-											<!-- <div class="mt-3 col-lg-12 col-md-12 col-sm-12 form-group">
-															<label>Select Courses</label>
-															<div class="custom-control custom-checkbox">
-																<div class="row">
-																	<% for(let k = 0; k < allCourses.length; k++) { %>
-																	<div class="col-4">
-																		<input type="checkbox" name="courses"
-																			value="<%= allCourses[k]._id %>">
-																		<label><%= allCourses[k].name %></label>
-																	</div>
-																	<% } %>
-																</div>
-															</div>
-														</div> -->
 										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-secondary"
-												data-dismiss="modal">Close</button>
-											<button type="submit" class="btn btn-warning">Save changes</button>
-										</div>
-									</form>
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn btn-secondary"
+											data-dismiss="modal">Close</button>
+										<button type="submit" class="btn btn-warning">Save changes</button>
+									</div>
 								</div>
 							</div>
-
 						</div>
-
 						<% } %>
-
 					</tbody>
 				</table>
 			</div>

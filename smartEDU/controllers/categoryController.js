@@ -20,7 +20,7 @@ const createCategory = async (req, res) => {
 
 const updateCategory = async (req, res) => {
   try {
-    const category = await Category.updateOne(
+    await Category.updateOne(
       { _id: req.params.id },
       {
         name: req.body.name,
@@ -41,14 +41,13 @@ const updateCategory = async (req, res) => {
 
 const deleteCategory = async (req, res) => {
   try {
-    const categoryOne = await Category.findOne({ _id: req.params.id });
-    await Category.findOneAndRemove({ _id: req.params.id });
     await Course.updateMany(
-      { category: categoryOne._id },
+      { category: req.params.id },
       {
-        $pull: { category: categoryOne._id },
+        $pull: { category: req.params.id },
       }
     );
+    await Category.findOneAndRemove({ _id: req.params.id });
 
     req.flash('success', `Category has been removed succesfully !`);
     res.status(200).redirect('/users/dashboard');

@@ -10,14 +10,37 @@ const createUser = async (req, res) => {
   const newUser = req.body;
   try {
     if (!errors.array().length > 0) {
-      await User.create(newUser);
-      const user = await User.findOne({ name: newUser.name });
-      await Course.updateMany(
-        { _id: newUser.courses },
-        {
-          $push: { students: user._id },
-        }
-      );
+      if (newUser.role === 'student') {
+        await User.create({
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          role: req.body.role,
+          courses: { learn: req.body.courses },
+        });
+        const user = await User.findOne({ name: newUser.name });
+        await Course.updateMany(
+          { _id: newUser.courses },
+          {
+            $push: { students: user._id },
+          }
+        );
+      } else if (newUser.role === 'teacher') {
+        await User.create({
+          name: req.body.name,
+          email: req.body.email,
+          password: req.body.password,
+          role: req.body.role,
+          courses: { teach: req.body.courses },
+        });
+        const user = await User.findOne({ name: newUser.name });
+        await Course.updateMany(
+          { _id: newUser.courses },
+          {
+            $push: { teachers: user._id },
+          }
+        );
+      }
 
       req.flash('success', `"${req.body.name}" has been created succesfully !`);
       res.status(201).redirect('/users/dashboard');
@@ -34,27 +57,40 @@ const createUser = async (req, res) => {
 
 const updateStudent = async (req, res) => {
   try {
+    const updateUser = await User.findOne({ _id: req.params.id });
     await Course.updateMany(
       { students: req.params.id },
       {
         $pull: { students: req.params.id },
       }
     );
-    await User.updateOne(
-      { _id: req.params.id },
-      {
-        name: req.body.name,
-        email: req.body.email,
-        role: req.body.role,
-        courses: req.body.courses,
-      }
-    );
-    await Course.updateMany(
-      { _id: req.body.courses },
-      {
-        $push: { students: req.params.id },
-      }
-    );
+    if (req.body.role === 'student') {
+      updateUser.name = await req.body.name;
+      updateUser.email = await req.body.email;
+      updateUser.courses.learn = await req.body.courses;
+      updateUser.save();
+
+      await Course.updateMany(
+        { _id: req.body.courses },
+        {
+          $push: { students: req.params.id },
+        }
+      );
+    } else if (req.body.role === 'teacher') {
+      updateUser.name = await req.body.name;
+      updateUser.email = await req.body.email;
+      updateUser.courses.teach = await req.body.courses;
+      updateUser.courses.learn = [];
+      updateUser.role = await req.body.role;
+      await updateUser.save();
+
+      await Course.updateMany(
+        { _id: req.body.courses },
+        {
+          $push: { teachers: req.params.id },
+        }
+      );
+    }
     req.flash('success', `'${req.body.name}' has been updated succesfully !`);
     res.status(200).redirect('/users/dashboard');
   } catch (error) {
@@ -82,14 +118,38 @@ const deleteStudent = async (req, res) => {
 
 const updateTeacher = async (req, res) => {
   try {
-    await User.updateOne(
-      { _id: req.params.id },
+    const updateUser = await User.findOne({ _id: req.params.id });
+    await Course.updateMany(
+      { teachers: updateUser._id },
       {
-        name: req.body.name,
-        email: req.body.email,
-        role: req.body.role,
+        $pull: { teachers: updateUser._id },
       }
     );
+    if (req.body.role === 'teacher') {
+      updateUser.name = await req.body.name;
+      updateUser.email = await req.body.email;
+      updateUser.courses.teach = await req.body.courses;
+      updateUser.save();
+      await Course.updateMany(
+        { _id: req.body.courses },
+        {
+          $push: { teachers: updateUser._id },
+        }
+      );
+    } else if (req.body.role === 'student') {
+      updateUser.name = await req.body.name;
+      updateUser.email = await req.body.email;
+      updateUser.courses.learn = await req.body.courses;
+      updateUser.courses.teach = [];
+      updateUser.role = await req.body.role;
+      await updateUser.save();
+      await Course.updateMany(
+        { _id: req.body.courses },
+        {
+          $push: { students: updateUser._id },
+        }
+      );
+    }
     req.flash('success', `'${req.body.name}' has been updated succesfully !`);
     res.status(200).redirect('/users/dashboard');
   } catch (error) {
@@ -100,24 +160,17 @@ const updateTeacher = async (req, res) => {
 
 const deleteTeacher = async (req, res) => {
   try {
-    const teacher = await User.findOneAndRemove({ _id: req.params.id });
-    const courses = await Course.deleteMany({ createdBy: req.params.id });
-    // await user.courses.pull({ _id: req.body.course_id });
-    // const students = await User.find({ role: 'student' });
-    // let result = [];
-    // const course = await Course.find({ createdBy: req.params.id });
-    // const coursesID = await course.map((course) => course._id);
-    // for (let i = 0; i < students.length; i++) {
-    //   for (let k = 0; k < coursesID.length; k++) {
-    //     if (students[i].courses.includes(coursesID[k])) {
-    //       console.log(coursesID[k], students[i].courses);
-    //     }
-    //   }
-    // }
-    // console.log(result);
+    await Course.updateMany(
+      { teachers: req.params.id },
+      {
+        $pull: { teachers: req.params.id },
+      }
+    );
+    await User.findOneAndRemove({ _id: req.params.id });
 
     req.flash('success', `Teacher has been removed succesfully !`);
     res.status(200).redirect('/users/dashboard');
+
   } catch (error) {
     req.flash('error', `Teacher delete was failed ! !`);
     res.status(400).redirect('/users/dashboard');
@@ -171,20 +224,20 @@ const getDashboardPage = async (req, res) => {
     const user = await User.findById(req.session.userID).populate('courses');
     const allCategories = await Category.find()
       .sort('name')
-      .populate('courses');
+      .populate(['courses', 'createdBy']);
     const courses = await Course.find({ createdBy: user }).sort({
       createdAt: -1,
     });
     const allCourses = await Course.find({})
       .sort({ name: 1 })
-      .populate(['createdBy', 'category']);
+      .populate(['createdBy', 'category', 'students', 'teachers']);
     const students = await User.find({ role: 'student' })
       .sort('name')
-      .populate('courses');
+      .populate({ path: 'courses', populate: { path: 'learn' } });
+
     const teachers = await User.find({ role: 'teacher' })
       .sort('name')
-      .populate('courses');
-    console.log(teachers[0].courses[0]);
+      .populate({ path: 'courses', populate: { path: 'teach' } });
 
     res.status(200).render('dashboard', {
       page_name: 'dashboard',

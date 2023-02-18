@@ -14,7 +14,8 @@ const createCourse = async (req, res) => {
         description: req.body.description,
         image: '/uploads/' + uploadedImage.name,
         category: req.body.category,
-        createdBy: req.body.ID || req.session.userID,
+        createdBy: req.session.userID,
+        teachers: req.body.ID || req.session.userID,
       });
       const course = await Course.findOne({ name: req.body.name });
       await Category.updateOne(
@@ -23,12 +24,11 @@ const createCourse = async (req, res) => {
           $push: { courses: course._id },
         }
       );
-      await User.updateOne(
-        { _id: course.createdBy },
-        {
-          $push: { courses: course._id },
-        }
-      );
+
+      const teacher = await User.findOne({ _id: req.body.ID });
+      teacher.courses.teach.push(course._id);
+      teacher.save();
+
       req.flash('success', `Course creation was successful ! !`);
       res.status(201).redirect('/users/dashboard');
     });
@@ -37,11 +37,81 @@ const createCourse = async (req, res) => {
     res.status(400).redirect('/users/dashboard');
   }
 };
+const updateCourse = async (req, res) => {
+  try {
+    let uploadedImage = await req.files.image;
+    let uploadPath = (await './public/uploads/') + uploadedImage.name;
+
+    const courseOne = await Course.findOne({ _id: req.params.id });
+    await User.updateMany(
+      { 'courses.teach': courseOne._id },
+      {
+        $pull: { 'courses.teach': courseOne._id },
+      }
+    );
+    await Category.updateMany(
+      { _id: courseOne.category },
+      {
+        $pull: { courses: courseOne._id },
+      }
+    );
+    uploadedImage.mv(uploadPath, async () => {
+      await Course.updateOne(
+        { _id: req.params.id },
+        {
+          name: req.body.name,
+          description: req.body.description,
+          image: '/uploads/' + uploadedImage.name,
+          category: req.body.category,
+          createdBy: req.session.userID,
+          teachers: req.body.ID || req.session.userID,
+
+          slug: slugify(req.body.name, {
+            lower: true,
+            strict: true,
+          }),
+        }
+      );
+      const updateCourse = await Course.findOne({ _id: courseOne._id });
+
+      await User.updateMany(
+        { _id: updateCourse.teachers },
+        {
+          $push: { 'courses.teach': updateCourse._id },
+        }
+      );
+      await Category.updateOne(
+        { _id: updateCourse.category },
+        {
+          $push: { courses: updateCourse._id },
+        }
+      );
+
+      req.flash('success', `'${req.body.name}' has been updated succesfully !`);
+      res.status(200).redirect('/users/dashboard');
+    });
+  } catch (error) {
+    req.flash('error', `Course update was failed ! !`);
+    res.status(400).redirect('/users/dashboard');
+  }
+};
 
 const deleteCourse = async (req, res) => {
   try {
     const course = await Course.findOne({ slug: req.params.slug });
     await User.updateMany(
+      { 'courses.teach': course._id },
+      {
+        $pull: { 'courses.teach': course._id },
+      }
+    );
+    await User.updateMany(
+      { 'courses.learn': course._id },
+      {
+        $pull: { 'courses.learn': course._id },
+      }
+    );
+    await Category.updateMany(
       { courses: course._id },
       {
         $pull: { courses: course._id },
@@ -53,62 +123,6 @@ const deleteCourse = async (req, res) => {
     res.status(200).redirect('/users/dashboard');
   } catch (error) {
     req.flash('error', `Course delete was failed ! !`);
-    res.status(400).redirect('/users/dashboard');
-  }
-};
-
-const updateCourse = async (req, res) => {
-  try {
-    let uploadedImage = await req.files.image;
-    let uploadPath = (await './public/uploads/') + uploadedImage.name;
-    const courseOne = await Course.findOne({ slug: req.params.slug });
-    await User.updateOne(
-      { _id: courseOne.createdBy },
-      {
-        $pull: { courses: courseOne._id },
-      }
-    );
-    await Category.updateOne(
-      { _id: courseOne.category },
-      {
-        $pull: { courses: courseOne._id },
-      }
-    );
-    uploadedImage.mv(uploadPath, async () => {
-      await Course.updateOne(
-        { slug: req.params.slug },
-        {
-          name: req.body.name,
-          description: req.body.description,
-          image: '/uploads/' + uploadedImage.name,
-          category: req.body.category,
-          createdBy: req.body.ID || req.session.userID,
-          slug: slugify(req.body.name, {
-            lower: true,
-            strict: true,
-          }),
-        }
-      );
-      const updateCourse = await Course.findOne({ _id: courseOne._id });
-
-      await User.updateOne(
-        { _id: updateCourse.createdBy },
-        {
-          $push: { courses: updateCourse._id },
-        }
-      );
-      await Category.updateOne(
-        { _id: updateCourse._id },
-        {
-          $push: { courses: updateCourse._id },
-        }
-      );
-
-      req.flash('success', `'${req.body.name}' has been updated succesfully !`);
-      res.status(200).redirect('/users/dashboard');
-    });
-  } catch (error) {
-    req.flash('error', `Course update was failed ! !`);
     res.status(400).redirect('/users/dashboard');
   }
 };
